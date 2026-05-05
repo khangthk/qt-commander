@@ -22,6 +22,7 @@
 #include "./ui_mainwindow.h"
 #include "fileinfowindow.h"
 #include "mountedvolumesdialog.h"
+#include "directorycomparewindow.h"
 
 #include <QFileIconProvider>
 #include <QMessageBox>
@@ -876,6 +877,7 @@ void MainWindow::connectMenuActions()
     connect(ui->actionRefresh, &QAction::triggered, this, &MainWindow::actionRefreshTriggered);
 
     connect(ui->actionCalculateChecksum, &QAction::triggered, this, &MainWindow::actionCalculateChecksumTriggered);
+    connect(ui->actionCompareDirectories, &QAction::triggered, this, &MainWindow::actionCompareDirectoriesTriggered);
 
     connect(ui->actionSaveSettings, &QAction::triggered, this, &MainWindow::actionSaveSettingsTriggered);
     connect(ui->actionLoadSettings, &QAction::triggered, this, &MainWindow::actionLoadSettingsTriggered);
@@ -930,6 +932,24 @@ void MainWindow::actionCalculateChecksumTriggered()
             refreshCurrentView();
         }
     }
+}
+
+void MainWindow::actionCompareDirectoriesTriggered()
+{
+    if (DirUtils::isSameDir(currentDirectoryLeft, currentDirectoryRight))
+    {
+        QMessageBox::information(
+            this, "Gleiches Verzeichnis",
+            QString("Die linke und die rechte Ansicht zeigen beide das gleiche Verzeichnis.")
+            + " Ein Vergleich ist daher nicht sinnvoll, da die Inhalte identisch sind."
+            );
+        return;
+    }
+
+    DirectoryCompareWindow* window = new DirectoryCompareWindow(
+        currentDirectoryLeft.absolutePath(), currentDirectoryRight.absolutePath(),
+        this);
+    window->show();
 }
 
 void MainWindow::actionSaveSettingsTriggered()

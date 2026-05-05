@@ -86,6 +86,7 @@ private slots:
     void actionRefreshTriggered();
 
     void actionCalculateChecksumTriggered();
+    void actionCompareDirectoriesTriggered();
 
     void actionSaveSettingsTriggered();
     void actionLoadSettingsTriggered();

@@ -232,6 +232,7 @@
      <string>Operationen</string>
     </property>
     <addaction name="actionCalculateChecksum"/>
+    <addaction name="actionCompareDirectories"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -446,6 +447,11 @@
   <action name="actionCalculateChecksum">
    <property name="text">
     <string>Prüfsumme berechnen ...</string>
+   </property>
+  </action>
+  <action name="actionCompareDirectories">
+   <property name="text">
+    <string>Verzeichnisse vergleichen</string>
    </property>
   </action>
  </widget>
