@@ -19,10 +19,11 @@
 */
 
 #include "compare.h"
-#include <algorithm>
+#include <algorithm> // for std::equal(), std::max()
 #include <fstream>
+#include <QDir>
 
-Compare::Order Compare::compare(const QFileInfo &left, const QFileInfo &right)
+Compare::Order Compare::order(const QFileInfo &left, const QFileInfo &right)
 {
     if (left.isDir() != right.isDir())
     {
@@ -70,4 +71,151 @@ Compare::Content Compare::contents(const QFileInfo &left, const QFileInfo &right
                       std::istreambuf_iterator<char>(),
                       std::istreambuf_iterator<char>(streamRight.rdbuf()))
         ? Content::Identical : Content::Different;
+}
+
+QList<Compare::Info> Compare::compareDirectories(const QString &left, const QString &right)
+{
+    const QDir::Filters compareFilter = QDir::Filter::AllEntries
+                                        | QDir::Filter::NoDotAndDotDot
+                                        | QDir::Filter::Hidden
+                                        | QDir::Filter::System;
+    const QDir::SortFlags compareSort = QDir::SortFlag::Name
+                                        | QDir::SortFlag::DirsFirst
+                                        | QDir::SortFlag::IgnoreCase;
+
+    QDir leftDir(left);
+    QDir rightDir(right);
+    if (!leftDir.exists() || !rightDir.exists())
+    {
+        return {};
+    }
+
+    leftDir.setFilter(compareFilter);
+    leftDir.setSorting(compareSort);
+
+    rightDir.setFilter(compareFilter);
+    rightDir.setSorting(compareSort);
+
+    const QFileInfoList leftList = leftDir.entryInfoList();
+    const QFileInfoList rightList = rightDir.entryInfoList();
+
+    auto leftCurrent = leftList.cbegin();
+    auto rightCurrent = rightList.cbegin();
+
+    // TODO: emit signal: progress reset to zero
+    // TODO: emit signal: set maximum to leftList.size() + rightList.size()
+
+    QList<Compare::Info> result(std::max(leftList.size(), rightList.size()));
+
+    while ((leftCurrent != leftList.cend()) || (rightCurrent != rightList.cend()))
+    {
+        const bool leftFinished = leftCurrent == leftList.cend();
+        const bool rightFinished = rightCurrent == rightList.cend();
+
+        if (leftFinished)
+        {
+            // Entry only exists on right side.
+            result.append(rightSideOnly(*rightCurrent));
+            ++rightCurrent;
+            // TODO: emit signal: progress increased by one
+        }
+        else if (rightFinished)
+        {
+            // Entry only exists on left side.
+            result.append(leftSideOnly(*leftCurrent));
+            ++leftCurrent;
+            // TODO: emit signal: progress increased by one
+        }
+        else
+        {
+            // Both sides still have elements.
+            const auto order = Compare::order(*leftCurrent, *rightCurrent);
+            switch (order) {
+            case Compare::Order::LeftIsFirst:
+                result.append(leftSideOnly(*leftCurrent));
+                ++leftCurrent;
+                // TODO: emit signal: progress increased by one
+                continue;
+                break;
+            case Compare::Order::RightIsFirst:
+                result.append(rightSideOnly(*rightCurrent));
+                ++rightCurrent;
+                // TODO: emit signal: progress increased by one
+                continue;
+                break;
+            default:
+                break;
+            }
+
+            // File name and type (file or directory) is the same on both sides.
+            if (leftCurrent->isDir())
+            {
+                result.append(directoryExists(*leftCurrent, *rightCurrent));
+                ++leftCurrent;
+                ++rightCurrent;
+                // TODO: emit signal: progress increased by two
+                continue;
+            }
+
+            result.append(fileEntry(*leftCurrent, *rightCurrent));
+            ++leftCurrent;
+            ++rightCurrent;
+            // TODO: emit signal: progress increased by two
+        }
+    }
+
+    return result;
+}
+
+Compare::Info Compare::leftSideOnly(const QFileInfo &info)
+{
+    Info result;
+    result.name = info.fileName();
+    result.isDirectory = info.isDir();
+    result.result = Result::LeftSideOnly;
+    result.leftDate = info.lastModified();
+    result.rightDate = QDateTime();
+    result.leftSize = info.size();
+    result.rightSize = -1;
+    return result;
+}
+
+Compare::Info Compare::rightSideOnly(const QFileInfo &info)
+{
+    Info result;
+    result.name = info.fileName();
+    result.isDirectory = info.isDir();
+    result.result = Result::RightSideOnly;
+    result.leftDate = QDateTime();
+    result.rightDate = info.lastModified();
+    result.leftSize = -1;
+    result.rightSize = info.size();
+    return result;
+}
+
+Compare::Info Compare::directoryExists(const QFileInfo &left, const QFileInfo &right)
+{
+    Info result;
+    result.name = left.fileName();
+    result.isDirectory = true;
+    result.result = Result::Unknown;
+    result.leftDate = left.lastModified();
+    result.rightDate = right.lastModified();
+    result.leftSize = -1;
+    result.rightSize = -1;
+    return result;
+}
+
+Compare::Info Compare::fileEntry(const QFileInfo &left, const QFileInfo &right)
+{
+    Info result;
+    result.name = left.fileName();
+    result.isDirectory = false;
+    result.result = static_cast<Result>(static_cast<std::underlying_type_t<Content>>(
+        Compare::contents(left, right)));
+    result.leftDate = left.lastModified();
+    result.rightDate = right.lastModified();
+    result.leftSize = left.size();
+    result.rightSize = right.size();
+    return result;
 }

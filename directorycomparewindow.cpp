@@ -131,8 +131,8 @@ void DirectoryCompareWindow::compareDirectories(const QString &left, const QStri
         else
         {
             // Both sides still have elements.
-            const auto cmp = Compare::compare(*leftCurrent, *rightCurrent);
-            switch (cmp) {
+            const auto order = Compare::order(*leftCurrent, *rightCurrent);
+            switch (order) {
             case Compare::Order::LeftIsFirst:
                 addLeftSideOnlyEntry(*leftCurrent, loc);
                 ++leftCurrent;

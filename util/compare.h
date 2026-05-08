@@ -21,7 +21,10 @@
 #ifndef COMPARE_H
 #define COMPARE_H
 
+#include <type_traits> // for std::underlying_type_t (C++14)
 #include <QFileInfo>
+#include <QList>
+#include <QString>
 
 class Compare
 {
@@ -37,17 +40,52 @@ public:
         RightIsFirst
     };
 
-    static Order compare(const QFileInfo& left, const QFileInfo& right);
+    static Order order(const QFileInfo& left, const QFileInfo& right);
 
+    /// Enumeration to indicate the content comparison result between two files.
     enum class Content
     {
+        /// Files have the same conent.
         Identical,
+
+        /// Files have different content.
         Different,
+
+        /// Unknown (probably caused by I/O failure on one file read)
         Unknown
     };
 
     /// Compares the contents of two files.
     static Content contents(const QFileInfo& left, const QFileInfo& right);
+
+
+    enum class Result
+    {
+        Identical = static_cast<std::underlying_type_t<Content>>(Content::Identical),
+        Different = static_cast<std::underlying_type_t<Content>>(Content::Different),
+        Unknown = static_cast<std::underlying_type_t<Content>>(Content::Unknown),
+        LeftSideOnly,
+        RightSideOnly
+    };
+
+    struct Info
+    {
+        QString name;
+        bool isDirectory;
+        Result result;
+        QDateTime leftDate;
+        QDateTime rightDate;
+        qint64 leftSize;
+        qint64 rightSize;
+    };
+
+    static QList<Info> compareDirectories(const QString &left, const QString &right);
+
+private:
+    static Info leftSideOnly(const QFileInfo& info);
+    static Info rightSideOnly(const QFileInfo& info);
+    static Info directoryExists(const QFileInfo& left, const QFileInfo &right);
+    static Info fileEntry(const QFileInfo& left, const QFileInfo &right);
 };
 
 #endif // COMPARE_H
