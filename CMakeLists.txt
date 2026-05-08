@@ -78,6 +78,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/durationutils.h util/durationutils.cpp
         checksumdialog.h checksumdialog.cpp checksumdialog.ui
         viewers/pdfviewwindow.h viewers/pdfviewwindow.cpp viewers/pdfviewwindow.ui
+        directorycomparewindow.h directorycomparewindow.cpp directorycomparewindow.ui
+        util/compare.h util/compare.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET qt-commander APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
