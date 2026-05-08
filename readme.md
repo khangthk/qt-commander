@@ -9,7 +9,14 @@ such as copying, moving, and deleting files and directories as well as the
 creation of new directories are possible.
 
 It includes viewers for text files, PDF, image files and even players for audio
-and video files.
+and video files. Furthermore, it can calculate checksums for files and also
+allows directory comparisons.
+
+## Available releases
+
+Check out the [release section](https://github.com/striezel/qt-commander/releases)
+to download the latest available release of Qt Commander. Pre-built packages for
+Windows and some common Linux distributions are provided there.
 
 ## Building from source
 
