@@ -61,10 +61,19 @@ public:
 
     enum class Result
     {
+        /// Files have the same conent.
         Identical = static_cast<std::underlying_type_t<Content>>(Content::Identical),
+
+        /// Files have different content.
         Different = static_cast<std::underlying_type_t<Content>>(Content::Different),
+
+        /// Unknown (probably caused by I/O failure on one file read)
         Unknown = static_cast<std::underlying_type_t<Content>>(Content::Unknown),
+
+        /// Item is only present in the left-side directory.
         LeftSideOnly,
+
+        /// Item is only present in the right-side directory.
         RightSideOnly
     };
 
@@ -79,8 +88,25 @@ public:
         qint64 rightSize;
     };
 
+    /// Performs comparison of the contents of the two directories with the left
+    /// and right paths. This may take some time (several seconds), depending
+    /// on the directory contents.
+    ///
+    /// Progress and results are reported by emitting signals:
+    /// - progressChanged() reports the current progress and will usually be
+    ///   emitted several times
+    /// - maximumChanged() reports the maximum progress value at the start of
+    ///   the comparison
+    /// - compareFinished() reports the comparision result after the comparison
+    ///   has completed
+    /// - compareCancelled() reports a partial comparision result after the
+    ///   comparison has been cancelled
     void compareDirectories(const QString &left, const QString &right);
 
+    /// Asks to cancel the comparison started by calling compareDirectories().
+    /// Note that this may not take effect immediately, but only after the
+    /// current file comparison is finished and before the next file pair is
+    /// compared.
     void requestCancellation();
 
 signals:
