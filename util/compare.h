@@ -40,7 +40,7 @@ public:
         RightIsFirst
     };
 
-    static Order order(const QFileInfo& left, const QFileInfo& right);
+    static Order order(const QFileInfo& left, const QFileInfo& right, const Qt::CaseSensitivity caseHandling);
 
     /// Enumeration to indicate the content comparison result between two files.
     enum class Content

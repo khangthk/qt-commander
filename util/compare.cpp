@@ -25,14 +25,14 @@
 #include <limits>
 #include <QDir>
 
-Compare::Order Compare::order(const QFileInfo &left, const QFileInfo &right)
+Compare::Order Compare::order(const QFileInfo &left, const QFileInfo &right, const Qt::CaseSensitivity caseHandling)
 {
     if (left.isDir() != right.isDir())
     {
         return left.isDir() ? Order::LeftIsFirst : Order::RightIsFirst;
     }
 
-    const int cmp = left.fileName().compare(right.fileName());
+    const int cmp = left.fileName().compare(right.fileName(), caseHandling);
     if (cmp < 0)
     {
         return Order::LeftIsFirst;
@@ -104,7 +104,18 @@ void Compare::compareDirectories(const QString &left, const QString &right)
                                         | QDir::Filter::System;
     const QDir::SortFlags compareSort = QDir::SortFlag::Name
                                         | QDir::SortFlag::DirsFirst
-                                        | QDir::SortFlag::IgnoreCase;
+#if defined(_WIN32)
+    // Not always right these days, but assumethat Windows FS is case-insensitive.
+                                        | QDir::SortFlag::IgnoreCase
+#endif
+        ;
+    const Qt::CaseSensitivity compareCaseSensitivity =
+#if defined(_WIN32)
+        Qt::CaseSensitivity::CaseInsensitive
+#else
+        Qt::CaseSensitivity::CaseSensitive
+#endif
+        ;
 
     QDir leftDir(left);
     QDir rightDir(right);
@@ -180,7 +191,7 @@ void Compare::compareDirectories(const QString &left, const QString &right)
         else
         {
             // Both sides still have elements.
-            const auto order = Compare::order(*leftCurrent, *rightCurrent);
+            const auto order = Compare::order(*leftCurrent, *rightCurrent, compareCaseSensitivity);
             switch (order) {
             case Compare::Order::LeftIsFirst:
                 result.append(leftSideOnly(*leftCurrent));

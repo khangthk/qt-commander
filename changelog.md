@@ -4,6 +4,12 @@ _(Note: This changelog focuses on the major changes between the different
 versions. Therefore, it may not contain all changes. Especially smaller fixes or
 improvements may be omitted.)_
 
+## Next Version (2026-05-??)
+
+* __[improvement]__
+  Improve handling of file names in directory comparison for file systems with
+  case-sensitive file names on non-Windows systems.
+
 ## Version 0.1.6 (2026-05-10)
 
 * __[new feature]__
