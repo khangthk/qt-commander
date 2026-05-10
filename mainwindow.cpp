@@ -618,7 +618,7 @@ void MainWindow::btnViewClicked()
 #else
         const QString title = QStringLiteral("Keine Datei ausgewählt");
         const QString message = QString("Es wurde keine Datei zum Anzeigen ausgewählt.\n\n")
-            + "Zum Betrachten können nur Dateien ausgewählt werden, nicht jedoch Verzeichnisse.");
+            + "Zum Betrachten können nur Dateien ausgewählt werden, nicht jedoch Verzeichnisse.";
 #endif
         QMessageBox::information(this, title, message);
         return;
@@ -934,7 +934,7 @@ void MainWindow::actionCalculateChecksumTriggered()
 #else
         const QString title = QStringLiteral("Keine Datei ausgewählt");
         const QString message = QString("Es wurde keine Datei zum Berechnen ausgewählt.\n\n")
-            + "Prüfsummen können nur von Dateien berechnet werden, nicht jedoch von Verzeichnissen.");
+            + "Prüfsummen können nur von Dateien berechnet werden, nicht jedoch von Verzeichnissen.";
 #endif
         QMessageBox::information(this, title, message);
         return;
