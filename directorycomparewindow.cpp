@@ -126,14 +126,14 @@ void DirectoryCompareWindow::addResult(const QList<Compare::Info>& list)
     }
 
     // Adjust width of columns with modification date.
-    ui->treeWidget->resizeColumnToContents(2);
-    ui->treeWidget->resizeColumnToContents(3);
+    ui->treeWidget->resizeColumnToContents(colIdxLeftDate);
+    ui->treeWidget->resizeColumnToContents(colIdxRightDate);
     // Adjust width of columns with file sizes.
-    ui->treeWidget->resizeColumnToContents(4);
-    ui->treeWidget->resizeColumnToContents(5);
+    ui->treeWidget->resizeColumnToContents(colIdxLeftSize);
+    ui->treeWidget->resizeColumnToContents(colIdxRightSize);
 
     ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
-    ui->treeWidget->header()->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+    ui->treeWidget->header()->setSectionResizeMode(colIdxResult, QHeaderView::ResizeMode::Stretch);
 
     ui->btnCancel->setEnabled(false);
 }
@@ -176,7 +176,7 @@ void DirectoryCompareWindow::treeWidgetSelectionChanged()
 
     const QTreeWidgetItem* item = selection.at(0);
     const Compare::Result selectedResult =
-        item->data(1, Qt::UserRole).value<Compare::Info>().result;
+        item->data(colIdxResult, Qt::UserRole).value<Compare::Info>().result;
     ui->actionCopyToLeft->setEnabled(selectedResult == Compare::Result::RightSideOnly);
     ui->actionCopyToRight->setEnabled(selectedResult == Compare::Result::LeftSideOnly);
 }
@@ -191,7 +191,7 @@ void DirectoryCompareWindow::actionCopyToLeftTriggered()
         return;
     }
     QTreeWidgetItem* item = selection.at(0);
-    Compare::Info info = item->data(1, Qt::UserRole).value<Compare::Info>();
+    Compare::Info info = item->data(colIdxResult, Qt::UserRole).value<Compare::Info>();
     if (info.result == Compare::Result::Identical)
     {
         QMessageBox::warning(
@@ -230,16 +230,16 @@ void DirectoryCompareWindow::actionCopyToLeftTriggered()
     }
 
     // Adjust widget item.
-    item->setIcon(1, QIcon::fromTheme("document-new"));
-    item->setText(1, "Dateien sind identisch.");
+    item->setIcon(colIdxResult, QIcon::fromTheme("document-new"));
+    item->setText(colIdxResult, "Dateien sind identisch.");
     info.result = Compare::Result::Identical;
     const QFileInfo fileInfo = QFileInfo(destination);
     info.leftDate = fileInfo.lastModified();
     info.leftSize = fileInfo.size();
     const QLocale loc = locale();
-    item->setText(2, loc.toString(info.leftDate, QLocale::NarrowFormat));
-    item->setText(4, loc.formattedDataSize(info.leftSize));
-    item->setData(1, Qt::UserRole, QVariant::fromValue(info));
+    item->setText(colIdxLeftDate, loc.toString(info.leftDate, QLocale::NarrowFormat));
+    item->setText(colIdxLeftSize, loc.formattedDataSize(info.leftSize));
+    item->setData(colIdxResult, Qt::UserRole, QVariant::fromValue(info));
 }
 
 void DirectoryCompareWindow::actionCopyToRightTriggered()
@@ -252,7 +252,7 @@ void DirectoryCompareWindow::actionCopyToRightTriggered()
         return;
     }
     QTreeWidgetItem* item = selection.at(0);
-    Compare::Info info = item->data(1, Qt::UserRole).value<Compare::Info>();
+    Compare::Info info = item->data(colIdxResult, Qt::UserRole).value<Compare::Info>();
     if (info.result == Compare::Result::Identical)
     {
         QMessageBox::warning(
@@ -291,16 +291,16 @@ void DirectoryCompareWindow::actionCopyToRightTriggered()
     }
 
     // Adjust widget item.
-    item->setIcon(1, QIcon::fromTheme("document-new"));
-    item->setText(1, "Dateien sind identisch.");
+    item->setIcon(colIdxResult, QIcon::fromTheme("document-new"));
+    item->setText(colIdxResult, "Dateien sind identisch.");
     info.result = Compare::Result::Identical;
     const QFileInfo fileInfo = QFileInfo(destination);
     info.rightDate = fileInfo.lastModified();
     info.rightSize = fileInfo.size();
     const QLocale loc = locale();
-    item->setText(3, loc.toString(info.rightDate, QLocale::NarrowFormat));
-    item->setText(5, loc.formattedDataSize(info.rightSize));
-    item->setData(1, Qt::UserRole, QVariant::fromValue(info));
+    item->setText(colIdxRightDate, loc.toString(info.rightDate, QLocale::NarrowFormat));
+    item->setText(colIdxRightSize, loc.formattedDataSize(info.rightSize));
+    item->setData(colIdxResult, Qt::UserRole, QVariant::fromValue(info));
 }
 
 void DirectoryCompareWindow::addLeftSideOnlyEntry(const Compare::Info &info, const QLocale &loc)
@@ -323,8 +323,8 @@ void DirectoryCompareWindow::addLeftSideOnlyEntry(const Compare::Info &info, con
     item->setIcon(0, info.isDirectory
                          ? icon_provider.icon(QAbstractFileIconProvider::Folder)
                          : icon_provider.icon(QAbstractFileIconProvider::File));
-    item->setIcon(1, QIcon::fromTheme("go-previous"));
-    item->setData(1, Qt::UserRole, QVariant::fromValue(info));
+    item->setIcon(colIdxResult, QIcon::fromTheme("go-previous"));
+    item->setData(colIdxResult, Qt::UserRole, QVariant::fromValue(info));
     ui->treeWidget->addTopLevelItem(item);
 }
 
@@ -348,8 +348,8 @@ void DirectoryCompareWindow::addRightSideOnlyEntry(const Compare::Info &info, co
     item->setIcon(0, info.isDirectory
                          ? icon_provider.icon(QAbstractFileIconProvider::Folder)
                          : icon_provider.icon(QAbstractFileIconProvider::File));
-    item->setIcon(1, QIcon::fromTheme("go-next"));
-    item->setData(1, Qt::UserRole, QVariant::fromValue(info));
+    item->setIcon(colIdxResult, QIcon::fromTheme("go-next"));
+    item->setData(colIdxResult, Qt::UserRole, QVariant::fromValue(info));
     ui->treeWidget->addTopLevelItem(item);
 }
 
@@ -367,8 +367,8 @@ void DirectoryCompareWindow::addDirectoryExistsEntry(const Compare::Info &info, 
     item->setIcon(0, icon_provider.icon(QAbstractFileIconProvider::Folder));
 
     // Subdirectories are not checked yet, so status is ... questionable / unknown.
-    item->setIcon(1, QIcon::fromTheme("dialog-question"));
-    item->setData(1, Qt::UserRole, QVariant::fromValue(info));
+    item->setIcon(colIdxResult, QIcon::fromTheme("dialog-question"));
+    item->setData(colIdxResult, Qt::UserRole, QVariant::fromValue(info));
     ui->treeWidget->addTopLevelItem(item);
 }
 
@@ -419,9 +419,9 @@ void DirectoryCompareWindow::addFileEntry(const Compare::Info &info, const QLoca
     }
     if (!icon.isNull())
     {
-        item->setIcon(1, icon);
+        item->setIcon(colIdxResult, icon);
     }
-    item->setData(1, Qt::UserRole, QVariant::fromValue(info));
+    item->setData(colIdxResult, Qt::UserRole, QVariant::fromValue(info));
 
     icon = icon_provider.icon(QAbstractFileIconProvider::File);
     item->setIcon(0, icon);

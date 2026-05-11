@@ -64,6 +64,13 @@ private slots:
     void actionCopyToRightTriggered();
 
 private:
+    // constants for column indices in tree widget
+    static constexpr int colIdxResult = 1;
+    static constexpr int colIdxLeftDate = 2;
+    static constexpr int colIdxRightDate = 3;
+    static constexpr int colIdxLeftSize = 4;
+    static constexpr int colIdxRightSize = 5;
+
     Ui::DirectoryCompareWindow *ui;
 
     bool initialShowDone;
