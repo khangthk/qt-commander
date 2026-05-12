@@ -42,6 +42,11 @@ public:
     explicit DirectoryCompareWindow(const QString& pathLeft, const QString& pathRight, QWidget *parent = nullptr);
     ~DirectoryCompareWindow();
 
+    /// Whether the left-side tree needs to be refreshed after the window closes.
+    bool leftTreeNeedsUpdate() const;
+
+    /// Whether the right-side tree needs to be refreshed after the window closes.
+    bool rightTreeNeedsUpdate() const;
 signals:
     void compareDirectories(const QString& left, const QString& right);
 
@@ -81,6 +86,9 @@ private:
     Compare* compare;
 
     const QFileIconProvider icon_provider;
+
+    bool leftSideChanged;
+    bool rightSideChanged;
 
     void addResult(const QList<Compare::Info>& list);
     void addInfoEntry(const Compare::Info& info, const QLocale& loc);

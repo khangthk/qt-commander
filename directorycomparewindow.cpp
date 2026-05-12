@@ -19,6 +19,7 @@
 */
 
 #include "directorycomparewindow.h"
+#include "mainwindow.h"
 #include "ui_directorycomparewindow.h"
 
 #include <QDir>
@@ -33,6 +34,8 @@ DirectoryCompareWindow::DirectoryCompareWindow(const QString& pathLeft, const QS
     , leftPath(pathLeft)
     , rightPath(pathRight)
     , compare(nullptr)
+    , leftSideChanged(false)
+    , rightSideChanged(false)
 {
     ui->setupUi(this);
 
@@ -49,7 +52,33 @@ DirectoryCompareWindow::DirectoryCompareWindow(const QString& pathLeft, const QS
 
 DirectoryCompareWindow::~DirectoryCompareWindow()
 {
+    if (leftTreeNeedsUpdate() || rightTreeNeedsUpdate())
+    {
+        MainWindow* castedParent = dynamic_cast<MainWindow*>(parent());
+        if (castedParent != nullptr)
+        {
+            if (leftTreeNeedsUpdate())
+            {
+                castedParent->changeLeftTree(leftPath);
+            }
+            if (rightTreeNeedsUpdate())
+            {
+                castedParent->changeRightTree(rightPath);
+            }
+        }
+    }
+
     delete ui;
+}
+
+bool DirectoryCompareWindow::leftTreeNeedsUpdate() const
+{
+    return leftSideChanged;
+}
+
+bool DirectoryCompareWindow::rightTreeNeedsUpdate() const
+{
+    return rightSideChanged;
 }
 
 void DirectoryCompareWindow::closeEvent(QCloseEvent *event)
@@ -241,6 +270,7 @@ void DirectoryCompareWindow::actionCopyToLeftTriggered()
                 "Die vorhandene Datei auf der linken Seite konnte nicht entfernt / überschrieben werden.");
             return;
         }
+        leftSideChanged = true;
     }
 
     if (!QFile::copy(source, destination))
@@ -251,6 +281,7 @@ void DirectoryCompareWindow::actionCopyToLeftTriggered()
                 + destination + " kopiert werden");
         return;
     }
+    leftSideChanged = true;
 
     // Adjust widget item.
     item->setIcon(colIdxResult, QIcon::fromTheme("document-new"));
@@ -321,6 +352,7 @@ void DirectoryCompareWindow::actionCopyToRightTriggered()
                 "Die vorhandene Datei auf der rechten Seite konnte nicht entfernt / überschrieben werden.");
             return;
         }
+        rightSideChanged = true;
     }
 
     if (!QFile::copy(source, destination))
@@ -331,6 +363,7 @@ void DirectoryCompareWindow::actionCopyToRightTriggered()
                 + destination + " kopiert werden");
         return;
     }
+    rightSideChanged = true;
 
     // Adjust widget item.
     item->setIcon(colIdxResult, QIcon::fromTheme("document-new"));
