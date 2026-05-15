@@ -40,10 +40,10 @@ public:
     /// Whether the user created new files during the dialog execution.
     bool hasCreatedNewFiles() const;
 
-    /// Sets the hash algorithm which is pre-selected for the dialog.
+    /// Sets the hash algorithm which is preselected for the dialog.
     ///
     /// Note: MD4 and Keccak variants are currently not supported.
-    void setPreSelectedAlgorithm(const QCryptographicHash::Algorithm algorithm);
+    void setPreselectedAlgorithm(const QCryptographicHash::Algorithm algorithm);
 signals:
     void hashAlgorithmChanged(const QCryptographicHash::Algorithm algorithm);
 private slots:

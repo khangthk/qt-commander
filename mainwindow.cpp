@@ -941,7 +941,7 @@ void MainWindow::actionCalculateChecksumTriggered()
     }
 
     CheckSumDialog dialog(selectedFile, this);
-    dialog.setPreSelectedAlgorithm(settings.getSelectedHashAlgorithm());
+    dialog.setPreselectedAlgorithm(settings.getSelectedHashAlgorithm());
     dialog.exec();
     if (dialog.hasCreatedNewFiles())
     {

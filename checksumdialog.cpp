@@ -82,7 +82,7 @@ bool CheckSumDialog::hasCreatedNewFiles() const
     return createdNewFiles;
 }
 
-void CheckSumDialog::setPreSelectedAlgorithm(const QCryptographicHash::Algorithm algorithm)
+void CheckSumDialog::setPreselectedAlgorithm(const QCryptographicHash::Algorithm algorithm)
 {
     switch (algorithm)
     {
