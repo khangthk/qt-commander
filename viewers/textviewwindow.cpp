@@ -33,6 +33,8 @@
 TextViewWindow::TextViewWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::TextViewWindow)
+    , actionGroup(nullptr)
+    , hl(nullptr)
 {
     ui->setupUi(this);
 
@@ -40,6 +42,10 @@ TextViewWindow::TextViewWindow(QWidget *parent)
     connect(ui->actionExit, &QAction::triggered, this, &TextViewWindow::close);
 
     connect(ui->actionChangeFont, &QAction::triggered, this, &TextViewWindow::actionChangeFontTriggered);
+    connect(ui->actionLanguageCpp, &QAction::triggered, this, &TextViewWindow::actionLanguageCppTriggered);
+    connect(ui->actionLanguageNone, &QAction::triggered, this, &TextViewWindow::actionLanguageNoneTriggered);
+
+    createActionGroup();
 
     setMonospacedFont();
 
@@ -144,6 +150,21 @@ void TextViewWindow::actionChangeFontTriggered()
     emit textViewerFontChanged(new_font);
 }
 
+void TextViewWindow::actionLanguageCppTriggered()
+{
+    if (hl != nullptr)
+    {
+        hl->setDocument(nullptr);
+        delete hl;
+    }
+    hl = new CppHighlighter(ui->plainTextEdit->document());
+}
+
+void TextViewWindow::actionLanguageNoneTriggered()
+{
+    removeHighlighter();
+}
+
 void TextViewWindow::scrollToTop()
 {
     QScrollBar* scrollBar = ui->plainTextEdit->verticalScrollBar();
@@ -159,4 +180,21 @@ void TextViewWindow::setMonospacedFont()
 {
     QFont font = QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont);
     ui->plainTextEdit->setFont(font);
+}
+
+void TextViewWindow::removeHighlighter()
+{
+    if (hl != nullptr)
+    {
+        hl->setDocument(nullptr);
+        delete hl;
+        hl = nullptr;
+    }
+}
+
+void TextViewWindow::createActionGroup()
+{
+    actionGroup = new QActionGroup(this);
+    actionGroup->addAction(ui->actionLanguageNone);
+    actionGroup->addAction(ui->actionLanguageCpp);
 }

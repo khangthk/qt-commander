@@ -46,8 +46,17 @@
     </property>
     <addaction name="actionChangeFont"/>
    </widget>
+   <widget class="QMenu" name="menuSyntaxHighlighting">
+    <property name="title">
+     <string>Syntaxhervorhebung</string>
+    </property>
+    <addaction name="actionLanguageNone"/>
+    <addaction name="separator"/>
+    <addaction name="actionLanguageCpp"/>
+   </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuOptions"/>
+   <addaction name="menuSyntaxHighlighting"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionExit">
@@ -75,6 +84,25 @@
   <action name="actionChangeFont">
    <property name="text">
     <string>Schriftart ändern ...</string>
+   </property>
+  </action>
+  <action name="actionLanguageCpp">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>C++</string>
+   </property>
+  </action>
+  <action name="actionLanguageNone">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Keine</string>
    </property>
   </action>
  </widget>

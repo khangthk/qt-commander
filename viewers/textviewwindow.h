@@ -22,9 +22,11 @@
 #define TEXTVIEWWINDOW_H
 
 #include <QMainWindow>
+#include <QActionGroup>
 #include <QCloseEvent>
 #include <QFont>
 #include <QString>
+#include "hl/cpphighlighter.h"
 
 namespace Ui {
 class TextViewWindow;
@@ -59,15 +61,26 @@ protected:
 private slots:
     void actionPrintTriggered();
     void actionChangeFontTriggered();
+    void actionLanguageCppTriggered();
+    void actionLanguageNoneTriggered();
 
 private:
     Ui::TextViewWindow *ui;
+
+    QActionGroup* actionGroup;
+    CppHighlighter* hl;
 
     /// Scrolls the text widget back to the top.
     void scrollToTop();
 
     /// Set the system's recommended fixed-size font for the text widget.
     void setMonospacedFont();
+
+    /// Remove existing syntax highlighting.
+    void removeHighlighter();
+
+    // Creates action group for the syntax highlighting menu.
+    void createActionGroup();
 };
 
 #endif // TEXTVIEWWINDOW_H
