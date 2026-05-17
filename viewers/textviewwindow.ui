@@ -50,9 +50,23 @@
     <property name="title">
      <string>Syntaxhervorhebung</string>
     </property>
-    <addaction name="actionLanguageNone"/>
-    <addaction name="separator"/>
-    <addaction name="actionLanguageCpp"/>
+    <widget class="QMenu" name="menuStyle">
+     <property name="title">
+      <string>Stil</string>
+     </property>
+     <addaction name="actionStyleAyuDark"/>
+     <addaction name="actionStyleAyuLight"/>
+    </widget>
+    <widget class="QMenu" name="menuLanguage">
+     <property name="title">
+      <string>Sprache</string>
+     </property>
+     <addaction name="actionLanguageNone"/>
+     <addaction name="separator"/>
+     <addaction name="actionLanguageCpp"/>
+    </widget>
+    <addaction name="menuLanguage"/>
+    <addaction name="menuStyle"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuOptions"/>
@@ -103,6 +117,25 @@
    </property>
    <property name="text">
     <string>Keine</string>
+   </property>
+  </action>
+  <action name="actionStyleAyuDark">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ayu Dark</string>
+   </property>
+  </action>
+  <action name="actionStyleAyuLight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ayu Light</string>
    </property>
   </action>
  </widget>

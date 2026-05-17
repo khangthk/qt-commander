@@ -61,13 +61,17 @@ protected:
 private slots:
     void actionPrintTriggered();
     void actionChangeFontTriggered();
+
     void actionLanguageCppTriggered();
     void actionLanguageNoneTriggered();
+
+    void actionStyleChangeTriggered(bool checked = false);
 
 private:
     Ui::TextViewWindow *ui;
 
-    QActionGroup* actionGroup;
+    QActionGroup* actionGroupLanguages;
+    QActionGroup* actionGroupStyles;
     CppHighlighter* hl;
 
     /// Scrolls the text widget back to the top.
@@ -79,8 +83,12 @@ private:
     /// Remove existing syntax highlighting.
     void removeHighlighter();
 
-    // Creates action group for the syntax highlighting menu.
-    void createActionGroup();
+    Theme* getSelectedTheme() const;
+
+    void updateWithNewTheme();
+
+    // Creates action groups for the syntax highlighting menu.
+    void createActionGroups();
 };
 
 #endif // TEXTVIEWWINDOW_H

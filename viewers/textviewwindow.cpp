@@ -29,12 +29,14 @@
 #include <QPrinter>
 #include <QScrollBar>
 #include <QTextStream>
+#include "hl/defaultthemedark.h"
 #include "hl/defaultthemelight.h"
 
 TextViewWindow::TextViewWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::TextViewWindow)
-    , actionGroup(nullptr)
+    , actionGroupLanguages(nullptr)
+    , actionGroupStyles(nullptr)
     , hl(nullptr)
 {
     ui->setupUi(this);
@@ -46,7 +48,10 @@ TextViewWindow::TextViewWindow(QWidget *parent)
     connect(ui->actionLanguageCpp, &QAction::triggered, this, &TextViewWindow::actionLanguageCppTriggered);
     connect(ui->actionLanguageNone, &QAction::triggered, this, &TextViewWindow::actionLanguageNoneTriggered);
 
-    createActionGroup();
+    connect(ui->actionStyleAyuDark, &QAction::triggered, this, &TextViewWindow::actionStyleChangeTriggered);
+    connect(ui->actionStyleAyuLight, &QAction::triggered, this, &TextViewWindow::actionStyleChangeTriggered);
+
+    createActionGroups();
 
     setMonospacedFont();
 
@@ -153,18 +158,24 @@ void TextViewWindow::actionChangeFontTriggered()
 
 void TextViewWindow::actionLanguageCppTriggered()
 {
-    if (hl != nullptr)
-    {
-        hl->setDocument(nullptr);
-        delete hl;
-    }
-    const DefaultThemeLight theme;
-    hl = new CppHighlighter(theme, ui->plainTextEdit->document());
+    removeHighlighter();
+    const Theme* theme = getSelectedTheme();
+    hl = new CppHighlighter(*theme, ui->plainTextEdit->document());
 }
 
 void TextViewWindow::actionLanguageNoneTriggered()
 {
     removeHighlighter();
+}
+
+void TextViewWindow::actionStyleChangeTriggered(bool checked)
+{
+    if (!checked)
+    {
+        return;
+    }
+
+    updateWithNewTheme();
 }
 
 void TextViewWindow::scrollToTop()
@@ -194,9 +205,36 @@ void TextViewWindow::removeHighlighter()
     }
 }
 
-void TextViewWindow::createActionGroup()
+Theme* TextViewWindow::getSelectedTheme() const
 {
-    actionGroup = new QActionGroup(this);
-    actionGroup->addAction(ui->actionLanguageNone);
-    actionGroup->addAction(ui->actionLanguageCpp);
+    if (ui->actionStyleAyuDark->isChecked())
+    {
+        return new DefaultThemeDark();
+    }
+
+    // Otherwise the light theme is checked.
+    return new DefaultThemeLight();
+}
+
+void TextViewWindow::updateWithNewTheme()
+{
+    if (ui->actionLanguageNone->isChecked())
+    {
+        return;
+    }
+
+    removeHighlighter();
+    const Theme* theme = getSelectedTheme();
+    hl = new CppHighlighter(*theme, ui->plainTextEdit->document());
+}
+
+void TextViewWindow::createActionGroups()
+{
+    actionGroupLanguages = new QActionGroup(this);
+    actionGroupLanguages->addAction(ui->actionLanguageNone);
+    actionGroupLanguages->addAction(ui->actionLanguageCpp);
+
+    actionGroupStyles = new QActionGroup(this);
+    actionGroupStyles->addAction(ui->actionStyleAyuDark);
+    actionGroupStyles->addAction(ui->actionStyleAyuLight);
 }
